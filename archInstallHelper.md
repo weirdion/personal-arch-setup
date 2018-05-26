@@ -70,7 +70,7 @@ Proceed? (Y/N): Y
 Command (? for help): n
 Partition number (1-128, default 1): 
 First sector (34-1953525134, default = 2048) or {+-}size{KMGTP}:      
-Last sector (2048-1953525134, default = 1953525134) or {+-}size{KMGTP}: 1025M
+Last sector (2048-1953525134, default = 1953525134) or {+-}size{KMGTP}: +1025M
 Current type is 'Linux filesystem'
 Hex code or GUID (L to show codes, Enter = 8300): EF00
 Changed type of partition to 'EFI System'
