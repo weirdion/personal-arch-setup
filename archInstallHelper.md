@@ -194,7 +194,33 @@ echo LANG=en_US.UTF-8 > /etc/locale.conf
 locale-gen
 ```
 
-# Set up systemd-boot
+## Set up multilib and install a few basic things
+
+```bash
+nano /etc/pacman.conf # Edit pacman.conf
+# Uncomment the following in /etc/pacman.conf
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+```
+
+Save, exit and sync
+```bash
+pacamn -Sy
+```
+
+Let's a couple things,
+
+```bash
+# Some general tools
+pacman -S bash-completion dialog wpa_supplicant net-tools
+
+# Xorg and drivers
+pacman -S xorg-server xorg-server-utils xf86-video-intel
+```
+
+
+## Set up systemd-boot
 
 ```bash
 # install systemd-boot to /boot
@@ -209,4 +235,39 @@ MODULES="xfs"
 .
 .
 HOOKS="base udev autodetect modconf block keymap encrypt lvm2 resume filesystems keyboard fsck"
+```
+
+## Configure bootloader entries for systemd-boot
+
+Edit /boot/loader/loader.conf
+(This contains which entry is loaded by default, and timeout in seconds)
+
+```bash
+timeout 3
+default arch
+editor 0
+```
+
+Let's first check your /dev/sda2 UUID for the next step
+```bash
+blkid /dev/sda2
+```
+
+Create /boot/loader/entries/arch.conf
+(This contains arch linux entry to boot archOS we just installed)
+
+```bash
+title	Arch Linux
+linux	/vmlinuz-linux
+initrd	/initramfs-linux.img
+options cryptdevice=UUID=<YOUR-/dev/sda2-UUID>:lvm:allow-discards resume=/dev/mapper/archgrp-swap root=/dev/mapper/archgrp-root rw
+```
+
+## Finish installation and reboot the system
+
+```bash
+mkinitcpio -p linux
+exit
+umount -R /mnt
+reboot
 ```
