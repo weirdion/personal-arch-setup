@@ -8,10 +8,10 @@
 # Created On: 02/13/2018
 # Last Edited On: 02/13/2018
 
-declare -r scriptUser="ankit"
+declare -r scriptUser="asadana"
 declare -r storeMountDir="/run/media/$scriptUser/store"
 declare -r homeDir="/home/$scriptUser"
-declare -r storeBlock=/dev/sda5
+declare -r storeBlock=/dev/mapper/store
 
 echo "$USER used when running this script"
 
@@ -45,12 +45,13 @@ mountStore() {
 handlePacmanApplications() {
 	pacman -Rc xf86-video-nouveau
 	pacman -R firefox
-	pacman -S bumblebee mesa xf86-video-intel nvidia lib32-nvidia-utils lib32-virtualgl nvidia-settings bbswitch
-	systemctl enable bumblebeed.service
+	#pacman -S bumblebee mesa xf86-video-intel nvidia lib32-nvidia-utils lib32-virtualgl nvidia-settings bbswitch 
+	#systemctl enable bumblebeed.service
 }
 
 handleGroups() {
 	groupadd sdkusers
+	groupadd plex
 	gpasswd -a $scriptUser lp
 	gpasswd -a $scriptUser sdkusers
 	gpasswd -a $scriptUser adm
@@ -58,11 +59,12 @@ handleGroups() {
 	gpasswd -a $scriptUser ftp
 	gpasswd -a $scriptUser rfkill
 	gpasswd -a $scriptUser sys
-	gpasswd -a $scriptUser bumblebee
+	#gpasswd -a $scriptUser bumblebee
 	gpasswd -a $scriptUser video
 	gpasswd -a $scriptUser plex
 }
 
+# Pulls the backed up lines from fstab-store
 appendFstab() {
 	echo
 	read -r -p "Do you want to add to fstab? [y/n]: " response3
@@ -84,9 +86,11 @@ if [ "$EUID" -ne 0 ]
   then echo "Please run this script as root"
   exit
 else
-	mountStore
 	handlePacmanApplications
+	mountStore
 	handleGroups
 	appendFstab
 fi
+
+# Not needed anymore unless using Grub2
 # sudo cp -rv $storeMountDir/backup/themes/ /boot/grub/themes/
