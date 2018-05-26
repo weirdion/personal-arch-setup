@@ -117,6 +117,8 @@ Now that we have all the partitions set, time to format and set up encryption an
 ## Format, Encrypt and LLVM
 
 ```bash
+pacman -S cryptsetup lvm2 xfsprogs
+
 mkfs.vfat -F32 /dev/sda1 # Format sda1 with Fat32
 
 cryptsetup -v luksFormat /dev/sda2 # Encrypt sda2 with Luks
@@ -217,6 +219,9 @@ pacamn -Sy
 Let's a couple things,
 
 ```bash
+# Make sure your system has everything we are using
+pacman -S cryptsetup lvm2 xfsprogs
+
 # Some general tools, net-tools is optional but nice to have
 
 pacman -S bash-completion dialog wpa_supplicant net-tools
