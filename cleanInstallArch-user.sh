@@ -6,11 +6,12 @@
 #
 # Created By: Ankit Sadana
 # Created On: 02/13/2018
-# Last Edited On: 05/25/2018
+# Last Edited On: 05/26/2018
 
 declare -r scriptUser="asadana"
 declare -r storeMountDir="/run/media/$scriptUser/store"
 declare -r homeDir="/home/$scriptUser"
+declare -r piaVersion="v80"
 
 createSoftLinks() {
 	echo
@@ -73,12 +74,17 @@ copyConfigFilesFromBackup() {
 	echo
 }
 
-installApplicationsWithPacaur() {
-	pacaur -S --noconfirm jdk8-openjdk vim ntfs-3g
-	pacaur -S --noconfirm tilix-bin plex-media-server remmina remmina-plugin-rdesktop insync xkeychain maven \
+installApplicationsWithAurHelper() {
+	yay -S --noconfirm jdk8-openjdk vim ntfs-3g
+	yay -S --noconfirm --sudoloop tilix-bin plex-media-server remmina remmina-plugin-rdesktop insync xkeychain maven \
 	google-chrome-beta git evolution qbittorrent openvpn networkmanager-openvpn openssh sublime-text-dev freerdp gradle \
-	powertop vlc python p7zip
-	pacaur -S --noconfirm telegram-desktop-bin slack-desktop discord
+	powertop vlc python p7zip telegram-desktop-bin slack-desktop discord
+}
+
+installPIA() {
+	wget https://installers.privateinternetaccess.com/download/pia-$piaVersion-installer-linux.tar.gz -O /tmp/pia.tar.gz && \
+	tar -xvf /tmp/pia.tar.gz -C /tmp/ && \
+	cd /tmp && ./pia-$piaVersion-installer-linux.sh
 }
 
 # Check if script is running as root
@@ -88,6 +94,7 @@ if [ "$EUID" -eq 0 ]
 else
 	createSoftLinks
 	copyConfigFilesFromBackup
-	installApplicationsWithPacaur
+	installApplicationsWithAurHelper
+	installPIA
 fi
 
