@@ -109,3 +109,28 @@ Number  Start (sector)    End (sector)  Size       Code  Name
 
 Command (? for help): w
 ```
+
+Now that we have all the partitions set, time to format and set up encryption and llvm.
+
+# Format, Encrypt and LLVM
+
+```bash
+mkfs.vfat -F32 /dev/sda1 # Format sda1 with Fat32
+
+cryptsetup -v luksFormat /dev/sda2 # Encrypt sda2 with Luks
+cryptsetup luksOpen /dev/sda2 arch # Open the newly encrypted drive and name it arch
+
+pvcreate /dev/mapper/arch # Create a Physical Volume
+vgcreate archgrp /dev/mapper/arch # Create a Volume Group named archgrp
+lvcreate -L 8G archgrp -n swap # Create a Logical Volume for swap with size 8GB
+lvcreate -l +100%FREE archgrp -n root # Create a Logical Volume for root with remaining size
+
+mkswap -f /dev/mapper/archgrp-swap -L swap # Make swap, label it swap
+mkfs.xfs -f /dev/mapper/archgrp-root -L archOS # Format root as XFS, label it archOS
+
+mount /dev/mapper/archgrp-root /mnt # Mount root at /mnt
+swapon /dev/mapper/archgrp-swap # Mount swap
+
+mkdir /mnt/boot # Create a dir inside root (/mnt)
+mount /dev/sda1 /mnt/boot # Mount sda1 to /mnt/boot
+```
