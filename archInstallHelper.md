@@ -33,7 +33,7 @@ For my use case, I want
 
 Now let's set this stuff up.
 ```bash
-# gdisk /dev/sda
+gdisk /dev/sda
 ```
 
 ```
@@ -200,6 +200,11 @@ locale-gen
 nano /etc/pacman.conf # Edit pacman.conf
 # Uncomment the following in /etc/pacman.conf
 
+# Misc options
+Color
+.
+.
+.
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 ```
@@ -212,7 +217,8 @@ pacamn -Sy
 Let's a couple things,
 
 ```bash
-# Some general tools
+# Some general tools, net-tools is optional but nice to have
+
 pacman -S bash-completion dialog wpa_supplicant net-tools
 
 # Xorg and drivers
@@ -270,4 +276,35 @@ mkinitcpio -p linux
 exit
 umount -R /mnt
 reboot
+```
+
+## Upon reboot
+
+You should be asked to decrypt before Arch is even loaded.
+
+```bash
+# Connect WiFi
+wifi-menu
+
+# Ping google
+ping -c 3 google.com
+```
+
+Let's set up "Yay" for secure AUR access
+
+```bash
+# Install git and go for Yay
+sudo pacman -S --noconfirm wget
+
+mkdir temp # temporary dir for installing yay
+cd temp
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/yay.tar.gz
+tar -xvf yay.tar.gz
+cd yay
+
+# Review the PKGBUILD to make sure you know what the script is doing
+cat PKGBUILD
+
+# Install
+makepkg -sri
 ```
