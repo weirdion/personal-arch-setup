@@ -24,10 +24,10 @@ For my use case, I want
 ```
 /dev/sda
     /dev/sda1 1024MB  /boot       -> For Systemd-boot
-    /dev/sda2 120GB   crypt/LLVM  -> For the root and swap (Size dependent on your needs)
+    /dev/sda2 120GB   crypt/LVM  -> For the root and swap (Size dependent on your needs)
         archgrp-swap  8GB   swap  -> Swap partition (optional, if you want to do a Swapfile in root instead)
         archgrp-root  112GB xfs   -> Root partition
-    /dev/sda3 810GB   crypt       -> Can be LLVM if needed
+    /dev/sda3 810GB   crypt       -> Can be LVM if needed
         store         810GB xfs   -> For data/backup partition that will persist across distros
 ```
 
@@ -112,9 +112,9 @@ Number  Start (sector)    End (sector)  Size       Code  Name
 Command (? for help): w
 ```
 
-Now that we have all the partitions set, time to format and set up encryption and llvm.
+Now that we have all the partitions set, time to format and set up encryption and lvm.
 
-## Format, Encrypt and LLVM
+## Format, Encrypt and LVM
 
 ```bash
 pacman -S cryptsetup lvm2 xfsprogs
@@ -131,6 +131,9 @@ lvcreate -l +100%FREE archgrp -n root # Create a Logical Volume for root with re
 
 mkswap -f /dev/mapper/archgrp-swap -L swap # Make swap, label it swap
 mkfs.xfs -f /dev/mapper/archgrp-root -L archOS # Format root as XFS, label it archOS
+
+cryptsetup -v luksFormat /dev/sda3 # Encrypt sda3 with Luks
+cryptsetup luksOpen /dev/sda3 store # Open the newly encrypted drive and name it store
 
 mount /dev/mapper/archgrp-root /mnt # Mount root at /mnt
 swapon /dev/mapper/archgrp-swap # Mount swap
@@ -279,6 +282,8 @@ options cryptdevice=UUID=<YOUR-/dev/sda2-UUID>:lvm:allow-discards resume=/dev/ma
 ```bash
 mkinitcpio -p linux
 exit
+cryptsetup luksClose /dev/sda2
+cryptsetup luksClose /dev/sda3
 umount -R /mnt
 reboot
 ```
