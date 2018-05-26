@@ -6,15 +6,15 @@
 
 sdX needs to be replaced by the correct USB letter
 ```bash
-# dd if=/path/to/archlinux.iso of=/dev/sdX bs=8M status=progress && sync
+sudo dd if=/path/to/archlinux.iso of=/dev/sdX bs=8M status=progress && sync
 ```
 
 ## Reboot system to boot from USB. Once in Arch shell, set up ntp and wifi.
 
 ```bash
-# timedatectl set-ntp true
-# wifi-menu
-# ping -c 3 www.google.com
+timedatectl set-ntp true
+wifi-menu
+ping -c 3 www.google.com
 ```
 
 ## Partition the disk with gdisk or fdisk
@@ -140,9 +140,73 @@ mount /dev/sda1 /mnt/boot # Mount sda1 to /mnt/boot
 ## Installing Arch base
 
 ```bash
-nano /etc/pacman.d/mirrorlist # Open mirrorlist and choose nearby mirror and copy (Alt+6) and paste (Ctr+U) at top.
+# Open mirrorlist and choose nearby mirror and copy (Alt+6) and paste (Ctr+U) at top.
+nano /etc/pacman.d/mirrorlist 
 pacstrap /mnt base base-devel # Install the arch base and base-devel
 genfstab -pU /mnt > /mnt/etc/fstab # Generate fstab
 ```
 
 *NOTE:* For all non-boot partitions SSD partitions, edit `/mnt/etc/fstab` and change relatime to noatime.
+
+
+## chroot into the system and set it up
+
+```bash
+arch-chroot /mnt
+
+# Set your timezone as Symbolic link to /etc/localtime
+ln -s /usr/share/zoneinfo/America/Indianapolis /etc/localtime
+hwclock --systohc
+
+echo archOS > /etc/hostname # Set your hostname to archOS (or something else)
+
+# Set your root password
+passwd
+
+# Create a user
+# useradd -m -G additional_groups -s login_shell username
+useradd -m -G wheel -s /bin/bash asadana # wheel group is used for admin, skip group for regular user.
+
+# Set password for your new user
+passwd asadana
+
+# Make sure sudo is installed
+pacman -S sudo
+
+# Let's enable wheel as sudo users
+EDITOR=nano visudo
+```
+
+Uncomment this line, then save and exit
+```bash
+%wheel ALL=(ALL) ALL
+```
+
+## Set up locales
+
+```bash
+#Uncomment en_US.UTF-8 UTF-8 in /etc/locale.gen
+nano /etc/locale.gen
+
+# Echo UTF-8 to /etc/locale.conf
+echo LANG=en_US.UTF-8 > /etc/locale.conf
+
+locale-gen
+```
+
+# Set up systemd-boot
+
+```bash
+# install systemd-boot to /boot
+bootctl --path=/boot install
+```
+
+Edit /etc/mkinitcpio.conf, add xfs to modules and add encrypt and lvm2 to hooks.
+
+```
+MODULES="xfs"
+.
+.
+.
+HOOKS="base udev autodetect modconf block keymap encrypt lvm2 resume filesystems keyboard fsck"
+`
