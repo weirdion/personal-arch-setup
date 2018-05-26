@@ -25,7 +25,7 @@ For my use case, I want
 /dev/sda
     /dev/sda1 1024MB  /boot       -> For Systemd-boot
     /dev/sda2 120GB   crypt/LLVM  -> For the root and swap (Size dependent on your needs)
-        archgrp-swap  8GB   swap  -> Swap partition (optional if you want to do a Swapfile inside root instead)
+        archgrp-swap  8GB   swap  -> Swap partition (optional, if you want to do a Swapfile in root instead)
         archgrp-root  112GB xfs   -> Root partition
     /dev/sda3 810GB   crypt       -> Can be LLVM if needed
         store         810GB xfs   -> For data/backup partition that will persist across distros
@@ -136,3 +136,13 @@ swapon /dev/mapper/archgrp-swap # Mount swap
 mkdir /mnt/boot # Create a dir inside root (/mnt)
 mount /dev/sda1 /mnt/boot # Mount sda1 to /mnt/boot
 ```
+
+## Installing Arch base
+
+```bash
+nano /etc/pacman.d/mirrorlist # Open mirrorlist and choose nearby mirror and copy (Alt+6) and paste (Ctr+U) at top.
+pacstrap /mnt base base-devel # Install the arch base and base-devel
+genfstab -pU /mnt > /mnt/etc/fstab # Generate fstab
+```
+
+*NOTE:* For all non-boot partitions SSD partitions, edit `/mnt/etc/fstab` and change relatime to noatime.
