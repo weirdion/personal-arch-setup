@@ -1,13 +1,15 @@
-###Arch Install Helper Notes
+# Arch Install Helper Notes
 
-# Create bootable USB
+---
+
+## Create bootable USB
 
 sdX needs to be replaced by the correct USB letter
 ```bash
 # dd if=/path/to/archlinux.iso of=/dev/sdX bs=8M status=progress && sync
 ```
 
-# Reboot system to boot from USB. Once in Arch shell, set up ntp and wifi.
+## Reboot system to boot from USB. Once in Arch shell, set up ntp and wifi.
 
 ```bash
 # timedatectl set-ntp true
@@ -15,7 +17,7 @@ sdX needs to be replaced by the correct USB letter
 # ping -c 3 www.google.com
 ```
 
-# Partition the disk with gdisk or fdisk
+## Partition the disk with gdisk or fdisk
 
 Depending on how you want your set up to be, set up partitions.
 For my use case, I want
@@ -112,7 +114,7 @@ Command (? for help): w
 
 Now that we have all the partitions set, time to format and set up encryption and llvm.
 
-# Format, Encrypt and LLVM
+## Format, Encrypt and LLVM
 
 ```bash
 mkfs.vfat -F32 /dev/sda1 # Format sda1 with Fat32
