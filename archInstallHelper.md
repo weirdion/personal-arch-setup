@@ -308,3 +308,20 @@ cat PKGBUILD
 # Install
 makepkg -sri
 ```
+
+Finally, unless you want a headless system, lets install a Desktop Environment.
+
+```bash
+sudo pacman -S plasma # "plasma is a group that will install general components of kde"
+# For other groups and desktop environments see https://www.archlinux.org/groups/x86_64/
+
+# Let's enable NetworkManager and SDDM for KDE.
+sudo systemctl enable NetworkManager.service
+sudo systemctl enable sddm.service
+
+# Let's do a reboot just for a clean start
+sudo shutdown -r now
+#
+```
+
+Enjoy!
