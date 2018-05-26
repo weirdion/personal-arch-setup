@@ -209,4 +209,4 @@ MODULES="xfs"
 .
 .
 HOOKS="base udev autodetect modconf block keymap encrypt lvm2 resume filesystems keyboard fsck"
-`
+```
